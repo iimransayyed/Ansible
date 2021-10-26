@@ -1,0 +1,7 @@
+#test ansible_connection=ssh new_hostname=remote1
+server1 ansible_connection=ssh new_hostname=remote1
+server2 ansible_connection=ssh new_hostname=remote2
+[aws]
+#ansible-client
+server1
+server2
