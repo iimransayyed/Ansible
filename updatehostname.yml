@@ -1,0 +1,16 @@
+---
+- name: Update web servers
+  hosts: aws
+  gather_facts: False
+  remote_user: ec2-user
+  become: yes
+
+  tasks:
+  - name: Update Remote Instance Hostname
+    hostname:
+      name: "{{ new_hostname }}"
+  - name: Commenting a line using the regualr expressions in Ansible.
+    replace:
+      path: /etc/hosts
+      regexp: '(.*10.10.*)'
+      replace: '#\1'
