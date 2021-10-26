@@ -1,0 +1,38 @@
+---
+- name: Prepare Remote Instance for AMS WIGS.
+  hosts: aws
+  gather_facts: False
+  remote_user: ec2-user
+  become: yes
+
+  tasks:
+  - name: Copy sshd_config file for backup
+    command: cp -f //etc/ssh/sshd_config /etc/ssh/sshd_config.bak
+  - name: comment Pubkey auth line
+    lineinfile: dest=/etc/ssh/sshd_config regexp="#PubkeyAuthentication yes" line="PubkeyAuthentication yes" state=present
+  - name: create redhat directory in remote instance.
+    file:
+      path: /etc/yum.repos.d/redhat
+      state: directory
+  - name: copy1
+    copy:
+      src: /home/ec2-user/redhat-rhui.repo
+      dest: /etc/yum.repos.d/
+  - name: copy2
+    copy:
+      src: /home/ec2-user/wigs/
+      dest: /home/ec2-user/wigs/
+      owner: ec2-user
+      group: ec2-user
+  - name: install1
+    yum:
+       name: rh-python36
+       state: present
+       update_cache: true
+  - name: install2
+    ansible.builtin.shell:
+      cmd: /opt/rh/rh-python36/root/usr/bin/pip install awscli --upgrade
+  - name: install3
+    ansible.builtin.shell:
+      cmd: chmod +x /home/ec2-user/wigs/./pre-wigs-validator && /home/ec2-user/wigs/./pre-wigs-validator -l -v
+#      cmd: /home/ec2-user/wigs/./pre-wigs-validator -l -v
